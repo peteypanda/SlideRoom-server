@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Created - {{ room_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background-color: #0066ff;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .header-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .room-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .room-header {
+            background-color: #0066ff;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .room-content {
+            padding: 20px;
+        }
+        
+        .qr-code {
+            margin: 20px auto;
+            max-width: 300px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .room-url {
+            word-break: break-all;
+            font-family: monospace;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .view-btn, .edit-btn {
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        .view-btn {
+            background-color: #e6f2ff;
+            color: #0066ff;
+        }
+        
+        .edit-btn {
+            background-color: #0066ff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Slides Manager</h1>
+        <div class="header-links">
+            <a href="/">Home</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="room-card">
+            <div class="room-header">
+                <i>🎉</i> Room Created Successfully!
+            </div>
+            <div class="room-content">
+                <h2>Room Name: {{ room_name }}</h2>
+                <div class="room-stat">
+                    <i>🔗</i>
+                    <p>Send this URL to IT:</p>
+                </div>
+                <div class="room-url">
+                    {{ room_url }}
+                </div>
+                <div class="room-stat">
+                    <i>📱</i>
+                    <p>Or scan this QR code to access the room:</p>
+                </div>
+                <div class="qr-code">
+                    <img src="data:image/png;base64,{{ qr_code }}" alt="Room QR Code">
+                </div>
+                <div class="button-group">
+                    <a href="{{ url_for('index') }}" class="view-btn">Back to Room List</a>
+                    <a href="{{ room_url }}" class="edit-btn">Go to Room</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

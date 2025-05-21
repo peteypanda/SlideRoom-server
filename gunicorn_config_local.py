@@ -1,0 +1,10 @@
+bind = "0.0.0.0:8443"  # Bind to HTTPS port
+workers = 4
+worker_class = "sync"
+timeout = 120
+keepalive = 5
+errorlog = "error.log"
+accesslog = "access.log"
+loglevel = "info"
+certfile = "local-cert.pem"  # SSL certificate
+keyfile = "local-key.pem"   # SSL private key

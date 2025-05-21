@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Room {{ room_id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            background-color: #0066ff;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .header-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+        
+        .header-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .upload-form {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+        }
+        
+        .upload-form h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .upload-form input[type="file"] {
+            margin: 10px 0;
+        }
+        
+        .upload-form button {
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .upload-form button:hover {
+            background-color: #0052cc;
+        }
+        
+        .slides-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .slide-item {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            background-color: white;
+        }
+        
+        .slide-preview {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            padding: 10px;
+        }
+        
+        .slide-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .slide-preview embed {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .slide-actions {
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            background-color: #f5f5f5;
+        }
+        
+        .slide-actions button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .share-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .share-btn:hover {
+            background-color: #218838;
+        }
+        
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        
+        .no-slides {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 30px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            color: #666;
+        }
+        
+        .view-room-btn {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #0066ff;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+        
+        .view-room-btn:hover {
+            background-color: #0052cc;
+        }
+
+        .room-info {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+        }
+
+        .room-info h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .qr-code-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .qr-code img {
+            width: 200px;
+            height: 200px;
+        }
+
+        .room-url {
+            flex: 1;
+        }
+
+        .room-url p {
+            margin: 0 0 10px 0;
+            color: #666;
+        }
+
+        .room-url input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .room-url button {
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .room-url button:hover {
+            background-color: #0052cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Slides Manager - Room {{ room_id }}</h1>
+        <div class="header-links">
+            <a href="/">Dashboard</a>
+            <a href="{{ url_for('room', room_id=room_id) }}" target="_blank">View Room</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="room-info">
+            <h2>Room Information</h2>
+            <div class="qr-code-container">
+                <div class="qr-code">
+                    <img src="data:image/png;base64,{{ qr_code }}" alt="Room QR Code">
+                </div>
+                <div class="room-url">
+                    <p>Room URL:</p>
+                    <input type="text" value="{{ room_url }}" readonly onclick="this.select()">
+                    <button onclick="navigator.clipboard.writeText('{{ room_url }}').then(() => alert('URL copied!'))">Copy URL</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="upload-form">
+            <h2>Upload New Slide</h2>
+            <form action="{{ url_for('upload_slide', room_id=room_id) }}" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" required>
+                <button type="submit">Upload Slide</button>
+            </form>
+        </div>
+        
+        <h2>Current Slides</h2>
+        <div class="slides-container">
+            {% if slides %}
+                {% for slide_path in slides %}
+                    <div class="slide-item">
+                        <div class="slide-preview">
+                            {% if slide_path.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')) %}
+                                <img src="{{ slide_path }}" alt="Slide {{ loop.index }}">
+                            {% elif slide_path.lower().endswith('.pdf') %}
+                                <embed src="{{ slide_path }}" type="application/pdf">
+                            {% endif %}
+                        </div>
+                        <div class="slide-actions">
+                            <form action="{{ url_for('share_slide', room_id=room_id, slide_index=loop.index0) }}" method="post">
+                                <button type="submit" class="share-btn">Share to All Rooms</button>
+                            </form>
+                            <form action="{{ url_for('delete_slide', room_id=room_id, slide_index=loop.index0) }}" method="post">
+                                <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this slide?')">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-slides">
+                    <p>No slides available for this room. Upload slides using the form above.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <a href="{{ url_for('room', room_id=room_id) }}" class="view-room-btn" target="_blank">View Fullscreen Room</a>
+    </div>
+</body>
+</html>

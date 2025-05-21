@@ -1,0 +1,19 @@
+[Unit]
+Description=Gunicorn instance to serve SlideRoom application
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/SlideRoom
+Environment="PATH=/home/ubuntu/SlideRoom/.venv/bin"
+ExecStart=/home/ubuntu/SlideRoom/.venv/bin/gunicorn \
+    --workers 3 \
+    --bind unix:/tmp/gunicorn.sock \
+    --error-logfile /home/ubuntu/SlideRoom/error.log \
+    --access-logfile /home/ubuntu/SlideRoom/access.log \
+    --capture-output \
+    app:app
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room {{ room_id }}</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+       
+        .fullscreen-slide {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+       
+        .fullscreen-slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+       
+        .fullscreen-slide embed {
+            width: 100%;
+            height: 100%;
+        }
+       
+        .slide {
+            display: none;
+        }
+       
+        .active {
+            display: flex;
+        }
+       
+        /* Message when no slides available */
+        .no-slides {
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="slideshow-container">
+        {% if slides %}
+            {% for slide_path in slides %}
+                <div class="fullscreen-slide slide {% if loop.first %}active{% endif %}" id="slide-{{ loop.index0 }}">
+                    {% if slide_path.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')) %}
+                        <img src="{{ slide_path }}" alt="Slide {{ loop.index }}">
+                    {% elif slide_path.lower().endswith('.pdf') %}
+                        <embed src="{{ slide_path }}" type="application/pdf">
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-slides">
+                No slides available for this room.
+            </div>
+        {% endif %}
+    </div>
+       
+    <script>
+        // Current slide count to detect changes
+        let currentSlideCount = {{ slides|length }};
+        let lastModified = new Date().getTime();
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        
+        // Function to show a specific slide
+        function showSlide(index) {
+            // Hide all slides
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+            
+            // Show the selected slide
+            if (slides.length > 0) {
+                slides[index].classList.add('active');
+            }
+        }
+        
+        // Function to advance to next slide
+        function nextSlide() {
+            if (slides.length > 0) {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }
+        }
+        
+        // Function to check for updates
+        function checkForUpdates() {
+            fetch('/api/check_updates/{{ room_id }}?timestamp=' + lastModified)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.hasUpdates) {
+                        console.log('Updates detected, refreshing page');
+                        window.location.reload();
+                    } else {
+                        // Update the timestamp for the next check
+                        lastModified = new Date().getTime();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking for updates:', error);
+                });
+        }
+        
+        // Automatic slide rotation (every 10 seconds if there's more than one slide)
+        if (slides.length > 1) {
+            setInterval(nextSlide, 10000);
+        }
+        
+        // Check for updates every 5 seconds
+        setInterval(checkForUpdates, 5000);
+        
+        // Alternative: Simple refresh every 5 seconds
+        // Uncomment the line below if you prefer this method instead of the API check
+        // setInterval(() => window.location.reload(), 5000);
+    </script>
+</body>
+</html>
