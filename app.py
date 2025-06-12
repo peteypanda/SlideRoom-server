@@ -7,6 +7,7 @@ import qrcode
 from io import BytesIO
 import base64
 from werkzeug.utils import secure_filename
+from auth_db import init_db, verify_user
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -21,6 +22,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Ensure upload directory exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+init_db()
 
 # Add a route to serve uploaded files
 @app.route('/static/uploads/<filename>')
@@ -78,6 +80,14 @@ def generate_qr_code(url):
 # Route for the index page (room management page)
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    view_mode = request.args.get('view')
+    if view_mode == 'public':
+        authenticated = False
+    else:
+        if not check_auth():
+            return redirect(url_for('login'))
+        authenticated = True
+
     if request.method == 'POST':
         room_name = request.form.get('room_name')
         if room_name and room_name not in rooms:
@@ -88,7 +98,7 @@ def index():
             room_url = url_for('room', room_id=room_name, _external=True)
             qr_code = generate_qr_code(room_url)
             return render_template('room_created.html', room_name=room_name, room_url=room_url, qr_code=qr_code)
-    return render_template('index.html', rooms=rooms, slides=slides, authenticated=True, username='admin')
+    return render_template('index.html', rooms=rooms, slides=slides, authenticated=authenticated, username=session.get('username'))
 
 # Route to view a specific room (view-only mode)
 @app.route('/room/<room_id>')
@@ -98,18 +108,31 @@ def room(room_id):
     return render_template('fullscreen.html', room_id=room_id, slides=slides[room_id])
 
 def check_auth():
-    return True
+    return session.get('logged_in')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    return redirect(url_for('index'))
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if verify_user(username, password):
+            session['logged_in'] = True
+            session['username'] = username
+            return redirect(url_for('index'))
+        else:
+            return render_template('login.html', error='Invalid credentials')
+    return render_template('login.html', error=None)
 
 @app.route('/logout')
 def logout():
-    return redirect(url_for('index'))
+    session.pop('logged_in', None)
+    session.pop('username', None)
+    return redirect(url_for('login'))
 
 @app.route('/room/<room_id>/edit')
 def room_edit(room_id):
+    if not check_auth():
+        return redirect(url_for('login'))
     if room_id not in rooms:
         return "Room not found", 404
     room_url = url_for('room', room_id=room_id, _external=True)
@@ -136,6 +159,8 @@ def check_updates(room_id):
 # Route to upload a slide
 @app.route('/upload/<room_id>', methods=['POST'])
 def upload_slide(room_id):
+    if not check_auth():
+        return redirect(url_for('login'))
     if room_id not in rooms:
         return "Room not found", 404
    
@@ -166,6 +191,8 @@ def upload_slide(room_id):
 
 @app.route('/delete_slide/<room_id>/<int:slide_index>', methods=['POST'])
 def delete_slide(room_id, slide_index):
+    if not check_auth():
+        return redirect(url_for('login'))
     if room_id not in rooms or slide_index >= len(slides[room_id]):
         return "Slide not found", 404
    
@@ -199,6 +226,8 @@ def delete_slide(room_id, slide_index):
 # Route to share a slide across all rooms
 @app.route('/share_slide/<room_id>/<int:slide_index>', methods=['POST'])
 def share_slide(room_id, slide_index):
+    if not check_auth():
+        return redirect(url_for('login'))
     if room_id not in rooms or slide_index >= len(slides[room_id]):
         return "Slide not found", 404
    

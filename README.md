@@ -26,6 +26,8 @@ python app.py
 - Username: admin
 - Password: admin123
 
+An `users.db` SQLite database is created automatically on first run with these credentials.
+
 ## Environment Variables
 
 - `PORT`: Server port (default: 5006)
@@ -37,6 +39,7 @@ python app.py
 - `/templates/`: HTML templates
 - `app.py`: Main application file
 - `rooms.json`: Room data storage
+- `users.db`: User credential database (created on first run)
 
 ## Deployment
 
