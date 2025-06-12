@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  slideroom:
+    build: .
+    ports:
+      - "5006:80"
+    volumes:
+      - uploads:/app/static/uploads
+      - rooms:/app/rooms.json
+    environment:
+      - PORT=80
+      - HOST=0.0.0.0
+volumes:
+  uploads:
+  rooms:
