@@ -201,7 +201,7 @@ def upload_slide(room_id):
 def delete_slide(room_id, slide_index):
     if not check_auth():
         return redirect(url_for('login'))
-    if room_id not in rooms or slide_index >= len(slides[room_id]):
+    if room_id not in rooms or slide_index < 0 or slide_index >= len(slides[room_id]):
         return "Slide not found", 404
    
     slide_path = slides[room_id][slide_index]
