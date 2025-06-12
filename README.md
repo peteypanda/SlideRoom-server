@@ -21,6 +21,12 @@ pip install -r requirements.txt
 python app.py
 ```
 
+3. **Run with Docker Compose** (requires Docker):
+```bash
+docker compose up -d
+```
+This command builds the image and starts the container. Named volumes `uploads` and `rooms` ensure files in `static/uploads` and `rooms.json` persist between container restarts.
+
 ## Default Credentials
 
 - Username: admin
