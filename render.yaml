@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: slideroom
+    runtime: python
+    plan: free   # change to starter if you need persistent disks
+    region: oregon  # or your preferred region supported by Render
+
+    # Install requirements (Render automatically creates a virtualenv)
+    buildCommand: "pip install -r requirements.txt"
+
+    # Run the server with Gunicorn, binding to the port Render sets via $PORT
+    startCommand: "gunicorn app:app -b 0.0.0.0:$PORT"
+
+    # Uncomment the disk block below if you want uploads to persist across deploys.
+    # This requires a paid plan (Starter or above).
+    # disks:
+    #   - name: uploads
+    #     mountPath: /app/static/uploads
+    #     sizeGB: 1
+
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
