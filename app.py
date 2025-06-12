@@ -12,7 +12,7 @@ from auth_db import init_db, verify_user
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-# Enable HTTPS but disable content security policy for development
+# Configure Talisman; HTTPS is not enforced in development
 Talisman(app, force_https=False, content_security_policy=None)
 
 # Set upload folder and allowed extensions
