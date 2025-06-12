@@ -149,9 +149,17 @@ def upload_slide(room_id):
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        # Ensure filename is unique to avoid overwriting existing slides
+        if os.path.exists(filepath):
+            name, ext = os.path.splitext(filename)
+            counter = 1
+            while os.path.exists(filepath):
+                filename = f"{name}_{counter}{ext}"
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                counter += 1
         file.save(filepath)
         # Store the path starting with /static/
-        relative_path = f'/static/uploads/{filename}'  # This is the key change
+        relative_path = f'/static/uploads/{filename}'
         print(f"Adding slide with path: {relative_path}")  # Debug print
         
         if room_id not in slides:
