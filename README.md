@@ -47,6 +47,16 @@ An `users.db` SQLite database is created automatically on first run with these c
 - `rooms.json`: Room data storage
 - `users.db`: User credential database (created on first run)
 
+## Testing
+
+Run the test suite with [pytest](https://pytest.org/):
+
+```bash
+pytest
+```
+
+This command discovers and executes all tests in the `tests/` directory.
+
 ## Deployment
 
 ### Option 1: Deploy to Render.com (Recommended)
